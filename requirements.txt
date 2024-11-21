@@ -1,0 +1,3 @@
+proxy.py==2.4.9
+flask
+flask-cors

@@ -163,7 +163,7 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
             time.sleep(self.flags.throttle_delay)
             activity_summary["throttled_requests"] += 1
 
-    def _apply_json_malformed(self, request):
+    def _apply_json_malformed(self):
         """
         Modifies the request to return a malformed JSON response.
         """
@@ -183,7 +183,6 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
 
         # Send the response
         self.client.queue(response)
-        return None
 
     def before_upstream_connection(self, request: HttpParser) -> HttpParser:
         print("function: before_upstream_connection")
@@ -211,7 +210,8 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
             request = self._apply_rate_limit(request, request_counts)
 
         if request is not None and self.flags.json_malformed is True:
-            request = self._apply_json_malformed(request)
+            self._apply_json_malformed()
+            request = None
 
         return request
 

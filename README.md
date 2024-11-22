@@ -1,6 +1,12 @@
-# API Fault Injector
+# API Fault Injector: Enhancing API Robustness
 
 API Fault Injector is a tool designed to simulate various types of faults and errors in API responses. This can be useful for testing the robustness and error-handling capabilities of client applications.
+
+## Why API Fault Injector?
+
+- **API Robustness**: APIs are the heart of modern applications. Making sure they can handle errors and failures is crucial.
+- **Resilience Testing**: Simulating error conditions helps identify weaknesses and improve application resilience.
+- **Reliable Development**: Providing developers with tools to test error scenarios leads to more reliable and robust software.
 
 ## Features
 

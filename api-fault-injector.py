@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import logging
 import random
 import time
 from collections import defaultdict
@@ -9,6 +11,8 @@ from proxy.common.flag import flags
 from proxy.common.utils import build_http_response
 from proxy.http.parser import HttpParser
 from proxy.http.proxy import HttpProxyBasePlugin
+
+logger = logging.getLogger(__name__)
 
 # Track requests per client
 request_counts = defaultdict(list)
@@ -76,10 +80,6 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
         super().__init__(*args, **kwargs)
         self.filters: List[Dict[str, Any]] = []
 
-        # self.filters: List[Dict[str, Any]] = []
-        if self.flags.failure_rate is not None:
-            print("failure_rate", self.flags.failure_rate)
-
     def _apply_rate_limit(self, request: HttpParser, request_counts) -> HttpParser:
         client_ip = self.client.addr[0]
         if len(request_counts[client_ip]) >= self.flags.rate_limit:
@@ -89,7 +89,7 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
                 headers={b"Content-Type": b"text/plain"},
             )
 
-            print(f"Rate limit exceeded for {client_ip}")
+            logger.info(f"Rate limit exceeded for {client_ip}")
             activity_summary["rate_limited_requests"] += 1
             self.client.queue(response)
             return None
@@ -149,7 +149,7 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
                 reason=reason,
                 headers={b"Content-Type": b"text/plain"},
             )
-            print(f"Simulated failure for {self.client.addr[0]}")
+            logger.info(f"Simulated failure for {self.client.addr[0]}")
             activity_summary["failed_requests"] += 1
             self.client.queue(response)
             return None
@@ -159,7 +159,7 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
         # Simulate throttling based on self.throttle_rate
 
         if random.SystemRandom().random() < self.flags.throttle_rate:
-            print(f"Simulating throttling for {self.client.addr[0]}")
+            logger.info(f"Simulating throttling for {self.client.addr[0]}")
             time.sleep(self.flags.throttle_delay)
             activity_summary["throttled_requests"] += 1
 
@@ -185,7 +185,7 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
         self.client.queue(response)
 
     def before_upstream_connection(self, request: HttpParser) -> HttpParser:
-        print("function: before_upstream_connection")
+        logger.debug("function: before_upstream_connection")
 
         activity_summary["total_requests"] += 1
 
@@ -216,16 +216,18 @@ class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
         return request
 
     def handle_client_request(self, request: HttpParser) -> HttpParser:
-        print("function: handle_client_request")
+        logger.debug("function: handle_client_request")
         return self.before_upstream_connection(request)
 
     def on_client_connection_close(self) -> None:
         # Print activity summary report
-        print("\nActivity Summary Report:")
-        print(f"Total Requests: {activity_summary['total_requests']}")
-        print(f"Failed Requests: {activity_summary['failed_requests']}")
-        print(f"Throttled Requests: {activity_summary['throttled_requests']}")
-        print(f"Rate Limited Requests: {activity_summary['rate_limited_requests']}")
+        logger.info("Activity Summary Report:")
+        logger.info(f"Total Requests: {activity_summary['total_requests']}")
+        logger.info(f"Failed Requests: {activity_summary['failed_requests']}")
+        logger.info(f"Throttled Requests: {activity_summary['throttled_requests']}")
+        logger.info(
+            f"Rate Limited Requests: {activity_summary['rate_limited_requests']}"
+        )
 
 
 if __name__ == "__main__":

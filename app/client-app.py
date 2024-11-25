@@ -24,14 +24,16 @@ def timeit(do_print=False):
 
 
 @timeit()
-def _request(url="http://127.0.0.1:5000/api/data", use_proxy=True):
+def _request(url="http://localhost:5000/api/data", use_proxy=True):
     try:
-        proxies = {
-            "http": "http://localhost:8899",
-            "https": "http://localhost:8899",
-        }
+        proxies = {}
+        if use_proxy:
+            proxies = {
+                "http": "http://localhost:8899",
+                "https": "http://localhost:8899",
+            }
 
-        requests.get("http://127.0.0.1:5000/api/data", proxies=proxies, timeout=5)
+        requests.get(url, proxies=proxies, timeout=2)
         return {"error": 0}
     except Exception as e:
         print(f"Request failed: {e}")

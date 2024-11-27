@@ -1,9 +1,10 @@
-import json
+import sys
 import time
 from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
+import yaml
 
 
 def timeit(do_print=False):
@@ -33,18 +34,20 @@ def _request(url="http://localhost:5000/api/data", use_proxy=True):
                 "https": "http://localhost:8899",
             }
 
-        requests.get(url, proxies=proxies, timeout=2)
-        return {"error": 0}
+        response = requests.get(url, proxies=proxies, timeout=2)
+        if response.status_code == 200:
+            return {"error": 0, "status_code": response.status_code}
+        else:
+            return {"error": 1, "status_code": response.status_code}
     except Exception as e:
         print(f"Request failed: {e}")
-        return {"error": 1}
+        return {"error": 1, "status_code": -1}
 
 
 def main(request_count, batch_count, host, debug, error):
     results = []
 
-    def test_f():
-        _request(use_proxy=True)
+    test_f = lambda: _request(use_proxy=True)  # noqa: E731
 
     ts = time.time()
     with ThreadPoolExecutor(max_workers=batch_count) as executor:
@@ -60,22 +63,24 @@ def main(request_count, batch_count, host, debug, error):
         "success": get_stats(success_series),
         "count": request_count,
         "batch": batch_count,
-        "elapsed": time.time() - ts,
+        "elapsed": round(time.time() - ts, 3),
     }
 
     print()
-    print(json.dumps(stats, indent=2))
+    yaml.dump(stats, sys.stdout)
 
 
 def get_stats(data):
     ret = {
-        "min": min([r["elapsed"] for r in data], default=0),
-        "max": max([r["elapsed"] for r in data], default=0),
+        "min": round(min([r["elapsed"] for r in data], default=0), 2),
+        "max": round(max([r["elapsed"] for r in data], default=0), 2),
         "count": len(data),
-        "avg": sum([r["elapsed"] for r in data]) / len(data) if len(data) else 0,
+        "avg": (
+            round(sum([r["elapsed"] for r in data]) / len(data), 2) if len(data) else 0
+        ),
     }
     ret["variance"] = (
-        sum([(r["elapsed"] - ret["avg"]) ** 2 for r in data]) / ret["count"]
+        round(sum([(r["elapsed"] - ret["avg"]) ** 2 for r in data]) / ret["count"], 2)
         if ret["count"]
         else 0
     )

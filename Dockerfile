@@ -3,6 +3,9 @@
 FROM abhinavsingh/proxy.py
 LABEL maintainer = "Piuma <piuma@piumalab.org>"
 
+#Set working directory
+WORKDIR api-fault-injector
+
 # Install packages listed in requirements.txt file
 RUN pip install -r requirements.txt
 

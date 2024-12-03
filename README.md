@@ -50,7 +50,23 @@ API Fault Injector is a tool designed to simulate various types of faults and er
     python api-fault-injector.py --failure-rate 0.1 --failure-status-code 500 --throttle-rate 0.2
     ```
 
-## API Endpoints
+## Hosting api-fault-injector in Docker
+
+The following steps will guide you how to host api-fault-injector in Docker by building an image and launch the application in the Docker container by running the container.
+
+1. Building the Docker image :
+
+   Run the following command from the terminal
+
+   `docker build --tag api-fault-injector-proxy https://github.com/piuma/api-fault-injector.git`
+
+2. Run the Docker container :
+
+   Now run the container for the Docker image. Below is the run command to run the Docker image into the container
+
+   `docker run -it -p 8899:8899 --rm api-fault-injector-proxy`
+
+## Test application endpoints
 
 The API Fault Injector includes a test backend application that accepts any URL and responds with a JSON payload. Here are some examples:
 

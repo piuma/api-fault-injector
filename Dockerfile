@@ -1,24 +1,16 @@
-# Dockerfile to build an image/container to host api-fault-injector
+FROM python:3.13-alpine
+LABEL maintainer="Danilo <danilo@piumalab.org>"
 
-FROM abhinavsingh/proxy.py
-LABEL maintainer = "Piuma <piuma@piumalab.org>"
+WORKDIR /app
 
-# Clone repository for Docker Image creation
-RUN apk add git && \
-    git clone https://github.com/piuma/api-fault-injector.git && \
-    apk del git && \
-    cd api-fault-injector && \
-    pip install -r requirements.txt
+COPY api-fault-injector.py /app/
+COPY requirements.txt /app/
 
-#Set working directory
-WORKDIR api-fault-injector
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 #Make port 8899 available to the container
 EXPOSE 8899/tcp
 
 # Execute command
-ENTRYPOINT [ "python", "api-fault-injector.py" ]
-
-CMD [ \
-  "--hostname=0.0.0.0" \
-  ]
+ENTRYPOINT ["python3", "api-fault-injector.py", "--hostname=0.0.0.0"]

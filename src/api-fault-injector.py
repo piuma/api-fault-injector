@@ -70,7 +70,7 @@ flags.add_argument(
 
 flags.add_argument(
     "--json-malformed",
-    type=bool,
+    action="store_true",
     default=False,
     help="Default: False; Specify whether to return malformed JSON responses.",
 )

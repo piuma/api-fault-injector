@@ -77,11 +77,13 @@ flags.add_argument(
 
 
 class ApiFaultInjectorPlugin(HttpProxyBasePlugin):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.filters: List[Dict[str, Any]] = []
 
-    def _apply_rate_limit(self, request: HttpParser, request_counts) -> HttpParser:
+    def _apply_rate_limit(
+        self, request: HttpParser, request_counts: Dict[str, List[datetime]]
+    ) -> HttpParser:
         client_ip = self.client.addr[0]
         if len(request_counts[client_ip]) >= self.flags.rate_limit:
             response = build_http_response(

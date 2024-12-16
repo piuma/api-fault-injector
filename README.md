@@ -7,6 +7,7 @@ API Fault Injector is a tool designed to simulate various types of faults and er
 - **API Robustness**: APIs are the heart of modern applications. Making sure they can handle errors and failures is crucial.
 - **Resilience Testing**: Simulating error conditions helps identify weaknesses and improve application resilience.
 - **Reliable Development**: Providing developers with tools to test error scenarios leads to more reliable and robust software.
+- **Easy Integration**: Implemented as an HTTP proxy, it can be easily integrated with any application without modifying the app itself.
 
 ## Features
 
@@ -33,7 +34,7 @@ API Fault Injector is a tool designed to simulate various types of faults and er
 
 1. Run the API Fault Injector:
     ```sh
-	cd src
+    cd src
     ./api-fault-injector.py
     ```
 
